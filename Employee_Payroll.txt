@@ -1,0 +1,134 @@
+mysql> show tables;
+Empty set (0.00 sec)
+
+mysql> CREATE TABLE employee_payroll(id INT unsigned NOT NULL AUTO_INCREMENT, name VARCHAR(150) NOT NULL, salary Double NOT NULL, start DATE NOT NULL, PRIMARY KEY (id));
+Query OK, 0 rows affected (1.91 sec)
+
+mysql> select * from employee_payroll;
++----+---------+---------+------------+
+| id | name    | salary  | start      |
++----+---------+---------+------------+
+|  1 | Bill    | 1000000 | 2018-01-03 |
+|  2 | Terisa  | 2000000 | 2019-11-13 |
+|  3 | Charlie | 3000000 | 2020-05-21 |
++----+---------+---------+------------+
+3 rows in set (0.00 sec)
+
+mysql> select salary from employee_payroll where name = 'Bill';
++---------+
+| salary  |
++---------+
+| 1000000 |
+| 1000000 |
++---------+
+2 rows in set (0.87 sec)
+mysql> select * from employee_payroll
+    ->  where start between CAST('2019-01-01' as date) and date (now());
++----+---------+---------+------------+
+| id | name    | salary  | start      |
++----+---------+---------+------------+
+|  2 | Terisa  | 2000000 | 2019-11-13 |
+|  3 | Charlie | 3000000 | 2020-05-21 |
+|  5 | Terisa  | 2000000 | 2019-11-13 |
+|  6 | Charlie | 3000000 | 2020-05-21 |
++----+---------+---------+------------+
+4 rows in set (0.23 sec)
+
+mysql> alter table employee_payroll add gender CHAR(1) alter name;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'alter name' at line 1
+mysql> alter table employee_payroll add gender CHAR(1) after name;
+Query OK, 0 rows affected (6.16 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc employee_payroll;
++--------+--------------+------+-----+---------+----------------+
+| Field  | Type         | Null | Key | Default | Extra          |
++--------+--------------+------+-----+---------+----------------+
+| id     | int unsigned | NO   | PRI | NULL    | auto_increment |
+| name   | varchar(150) | NO   |     | NULL    |                |
+| gender | char(1)      | YES  |     | NULL    |                |
+| salary | double       | NO   |     | NULL    |                |
+| start  | date         | NO   |     | NULL    |                |
++--------+--------------+------+-----+---------+----------------+
+5 rows in set (1.81 sec)
+
+mysql> update employee_payroll set gender = 'F' where name = 'Terisa';
+Query OK, 2 rows affected (0.20 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+mysql> select * from employee_payroll
+    -> ;
++----+---------+--------+---------+------------+
+| id | name    | gender | salary  | start      |
++----+---------+--------+---------+------------+
+|  1 | Bill    | NULL   | 1000000 | 2018-01-03 |
+|  2 | Terisa  | F      | 2000000 | 2019-11-13 |
+|  3 | Charlie | NULL   | 3000000 | 2020-05-21 |
+|  4 | Bill    | NULL   | 1000000 | 2018-01-03 |
+|  5 | Terisa  | F      | 2000000 | 2019-11-13 |
+|  6 | Charlie | NULL   | 3000000 | 2020-05-21 |
++----+---------+--------+---------+------------+
+6 rows in set (0.00 sec)
+
+mysql> update employee_payroll set gender = 'M' where name = 'Bill' or name = 'Charlie';
+Query OK, 4 rows affected (0.19 sec)
+Rows matched: 4  Changed: 4  Warnings: 0
+
+mysql> select * from employee_payroll ;
++----+---------+--------+---------+------------+
+| id | name    | gender | salary  | start      |
++----+---------+--------+---------+------------+
+|  1 | Bill    | M      | 1000000 | 2018-01-03 |
+|  2 | Terisa  | F      | 2000000 | 2019-11-13 |
+|  3 | Charlie | M      | 3000000 | 2020-05-21 |
+|  4 | Bill    | M      | 1000000 | 2018-01-03 |
+|  5 | Terisa  | F      | 2000000 | 2019-11-13 |
+|  6 | Charlie | M      | 3000000 | 2020-05-21 |
++----+---------+--------+---------+------------+
+6 rows in set (0.00 sec)
+
+mysql> update employee_payroll set salary = 3000000.00 where name = 'Terisa';
+Query OK, 2 rows affected (0.07 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+mysql> select * from employee_payroll ;
++----+---------+--------+---------+------------+
+| id | name    | gender | salary  | start      |
++----+---------+--------+---------+------------+
+|  1 | Bill    | M      | 1000000 | 2018-01-03 |
+|  2 | Terisa  | F      | 3000000 | 2019-11-13 |
+|  3 | Charlie | M      | 3000000 | 2020-05-21 |
+|  4 | Bill    | M      | 1000000 | 2018-01-03 |
+|  5 | Terisa  | F      | 3000000 | 2019-11-13 |
+|  6 | Charlie | M      | 3000000 | 2020-05-21 |
++----+---------+--------+---------+------------+
+6 rows in set (0.00 sec)
+
+mysql> select avg(salary) from employee_payroll where gender = 'M' group by gender;
++-------------+
+| avg(salary) |
++-------------+
+|     2000000 |
++-------------+
+1 row in set (0.13 sec)
+
+mysql> select gender, avg(salary) from employee_payroll group by gender;
++--------+-------------+
+| gender | avg(salary) |
++--------+-------------+
+| M      |     2000000 |
+| F      |     3000000 |
++--------+-------------+
+2 rows in set (0.14 sec)
+
+mysql> select gender, count(name) from employee_payroll group by gender;
++--------+-------------+
+| gender | count(name) |
++--------+-------------+
+| M      |           4 |
+| F      |           2 |
++--------+-------------+
+2 rows in set (0.00 sec)
+
+mysql>
+
